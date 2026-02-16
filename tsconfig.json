@@ -1,12 +1,14 @@
 {
-"include": [
-  "./src/**/*"
-],
+  "include": [
+    "./src/**/*",
+    "./vite.config.ts"
+  ],
 "compilerOptions": {
   "strict": false,
   "strictPropertyInitialization": false,
   "esModuleInterop": true,
-  "target": "es5",
+      "target": "es5",
+    "moduleResolution": "node",
   "downlevelIteration": true,
   "lib": [
       "dom",

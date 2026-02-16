@@ -1,5 +1,5 @@
 import { SciChartSurface, HorizontalLineAnnotation } from "scichart";
-import { appTheme } from "../theme";
+import { appTheme } from "../../styles/theme";
 
 export const configureAnnotations = (sciChartSurface: SciChartSurface) => {
   // Add a vertical line annotation at the latest price

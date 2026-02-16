@@ -1,10 +1,10 @@
 import { easing, NumberRange, SciChartSurface } from "scichart";
-import { TPriceBar } from "./binanceRestClient";
-import { appTheme } from "./theme";
-import { configureAxes } from "./chart/configureAxes";
-import { configureSeries } from "./chart/configureSeries";
-import { configureModifiers } from "./chart/configureModifiers";
-import { configureAnnotations } from "./chart/configureAnnotations";
+import { TPriceBar } from "../../services/binanceRestClient";
+import { appTheme } from "../../styles/theme";
+import { configureAxes } from "./configureAxes";
+import { configureSeries } from "./configureSeries";
+import { configureModifiers } from "./configureModifiers";
+import { configureAnnotations } from "./configureAnnotations";
 
 export const createCandlestickChart = async (
   rootElement: string | HTMLDivElement,
@@ -19,11 +19,12 @@ export const createCandlestickChart = async (
 
   // Initialize chart components using modules
   const { xAxis } = configureAxes(sciChartSurface, wasmContext);
-  const { candleDataSeries, candlestickSeries, ohlcSeries } = configureSeries(
+  const { candleDataSeries, candlestickSeries } = configureSeries(
     sciChartSurface,
     wasmContext,
   );
-  configureModifiers(sciChartSurface);
+  const { zoomPanModifier, cursorModifier, selectionModifier } =
+    configureModifiers(sciChartSurface);
   const { latestPriceAnnotation } = configureAnnotations(sciChartSurface);
 
   // Update the latest price annotation position & colour
@@ -91,6 +92,7 @@ export const createCandlestickChart = async (
         priceBar.high,
         priceBar.low,
         priceBar.close,
+        { volume: priceBar.volume, isSelected: false } as any, // Cast to any to avoid IPointMetadata error
       );
     } else {
       // Case where the exchange sends a new candle, append it
@@ -100,6 +102,7 @@ export const createCandlestickChart = async (
         priceBar.high,
         priceBar.low,
         priceBar.close,
+        { volume: priceBar.volume, isSelected: false } as any, // Cast to any
       );
 
       // Is the latest candle in the viewport?
@@ -127,18 +130,37 @@ export const createCandlestickChart = async (
     );
   };
 
-  const enableCandlestick = () => {
-    candlestickSeries.isVisible = true;
-    ohlcSeries.isVisible = false;
-  };
+  const setTool = (tool: string) => {
+    // Disable all first
+    zoomPanModifier.isEnabled = false;
+    cursorModifier.isEnabled = false;
+    selectionModifier.isEnabled = false;
 
-  const enableOhlc = () => {
-    candlestickSeries.isVisible = false;
-    ohlcSeries.isVisible = true;
+    switch (tool) {
+      case "pan":
+        zoomPanModifier.isEnabled = true;
+        (zoomPanModifier as any).isZoomEnabled = false; // Pan only
+        break;
+      case "zoom":
+        zoomPanModifier.isEnabled = true;
+        (zoomPanModifier as any).isZoomEnabled = true; // Zoom
+        break;
+      case "cursor":
+        cursorModifier.isEnabled = true;
+        break;
+      case "selection":
+        selectionModifier.isEnabled = true;
+        break;
+      default:
+        // Default to pan
+        zoomPanModifier.isEnabled = true;
+        (zoomPanModifier as any).isZoomEnabled = false;
+        break;
+    }
   };
 
   return {
     sciChartSurface,
-    controls: { setData, onNewTrade, setXRange, enableCandlestick, enableOhlc },
+    controls: { setData, onNewTrade, setXRange, setTool },
   };
 };

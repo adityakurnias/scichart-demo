@@ -8,13 +8,20 @@ import {
   ToggleButtonGroup,
 } from "@mui/material";
 import commonClasses from "./styles/Examples.module.scss";
-import { createCandlestickChart } from "./createCandlestickChart";
+import { createCandlestickChart } from "./components/chart/createCandlestickChart";
 import { SciChartReact, TResolvedReturnType } from "scichart-react";
-import { binanceSocketClient, TRealtimePriceBar } from "./binanceSocketClient";
+import {
+  binanceSocketClient,
+  TRealtimePriceBar,
+} from "./services/binanceSocketClient";
 import { Observable, Subscription } from "rxjs";
-import { simpleBinanceRestClient, TPriceBar } from "./binanceRestClient";
-import { appTheme } from "./theme";
-import { ExampleDataProvider } from "./ExampleDataProvider";
+import {
+  simpleBinanceRestClient,
+  TPriceBar,
+} from "./services/binanceRestClient";
+import { appTheme } from "./styles/theme";
+import { ExampleDataProvider } from "./services/ExampleDataProvider";
+import { ChartToolbar } from "./components/ui/ChartToolbar";
 
 // SCICHART EXAMPLE
 // const drawExample = async (rootElement: string | HTMLDivElement) => {
@@ -94,7 +101,6 @@ export const drawExample =
   };
 
 export default function RealtimeTickingStockCharts() {
-  const [preset, setPreset] = React.useState<number>(0);
   const chartControlsRef = React.useRef<{
     setData: (symbolName: string, priceBars: TPriceBar[]) => void;
     onNewTrade: (
@@ -103,21 +109,20 @@ export default function RealtimeTickingStockCharts() {
       lastTradeBuyOrSell: boolean,
     ) => void;
     setXRange: (startDate: Date, endDate: Date) => void;
-    enableCandlestick: () => void;
-    enableOhlc: () => void;
+    setTool: (tool: string) => void;
   }>(undefined);
   const [dataSource, setDataSource] = React.useState<string>("Random");
-
-  const handleToggleButtonChanged = (event: any, state: number) => {
-    if (state === null || chartControlsRef.current === undefined) return;
-    setPreset(state);
-    console.log(`Toggling Candle/Ohlc state: ${state}`);
-    if (state === 0) chartControlsRef.current.enableCandlestick();
-    if (state === 1) chartControlsRef.current.enableOhlc();
-  };
+  const [activeTool, setActiveTool] = React.useState<string>("pan");
 
   const handleDataSourceChanged = (event: any) => {
     setDataSource(event.target.value);
+  };
+
+  const handleToolChange = (tool: string) => {
+    setActiveTool(tool);
+    if (chartControlsRef.current?.setTool) {
+      chartControlsRef.current.setTool(tool);
+    }
   };
 
   const initFunc = drawExample(dataSource);
@@ -125,21 +130,15 @@ export default function RealtimeTickingStockCharts() {
   return (
     <div
       className={commonClasses.ChartWrapper}
-      style={{ display: "flex", flexDirection: "column" }}
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100vh",
+        width: "100%",
+        overflow: "hidden",
+      }}
     >
       <div className={commonClasses.ToolbarRow} style={{ flex: "none" }}>
-        <ToggleButtonGroup
-          className={commonClasses.ToggleButtonGroup}
-          exclusive
-          value={preset}
-          onChange={handleToggleButtonChanged}
-          size="small"
-          color="primary"
-          aria-label="small outlined button group"
-        >
-          <ToggleButton value={0}>Candlestick Series</ToggleButton>
-          <ToggleButton value={1}>OHLC Series</ToggleButton>
-        </ToggleButtonGroup>
         <FormControl sx={{ marginTop: "1em" }}>
           <InputLabel
             id="data-source-label"
@@ -166,16 +165,18 @@ export default function RealtimeTickingStockCharts() {
           >
             <MenuItem value={"Random"}>Random</MenuItem>
             <MenuItem value={"com"}>Binance.com</MenuItem>
-            <MenuItem value={"us"}>Binance.us</MenuItem>
           </Select>
         </FormControl>
       </div>
+
       <SciChartReact
         key={dataSource}
         initChart={initFunc}
         onInit={(initResult: TResolvedReturnType<typeof initFunc>) => {
           const { subscription, controls } = initResult;
           chartControlsRef.current = controls;
+          // Apply initial tool
+          controls.setTool(activeTool);
 
           return () => {
             subscription.unsubscribe();
@@ -191,6 +192,7 @@ export default function RealtimeTickingStockCharts() {
           style: { flexBasis: "100%", flexGrow: 1, flexShrink: 1 },
         }}
       />
+      <ChartToolbar activeTool={activeTool} onToolChange={handleToolChange} />
     </div>
   );
 }

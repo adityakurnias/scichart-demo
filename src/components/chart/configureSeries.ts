@@ -3,17 +3,15 @@ import {
   SciChartSurface,
   OhlcDataSeries,
   FastCandlestickRenderableSeries,
-  FastOhlcRenderableSeries,
   FastLineRenderableSeries,
   XyMovingAverageFilter,
 } from "scichart";
-import { appTheme } from "../theme";
+import { appTheme } from "../../styles/theme";
 
 export const configureSeries = (
   sciChartSurface: SciChartSurface,
   wasmContext: TSciChart,
 ) => {
-  // The Candlestick Series requires a special dataseries type called OhlcDataSeries with o,h,l,c and date values
   const candleDataSeries = new OhlcDataSeries(wasmContext);
 
   const candlestickSeries = new FastCandlestickRenderableSeries(wasmContext, {
@@ -26,18 +24,6 @@ export const configureSeries = (
     strokeDown: appTheme.TV_Red,
   });
   sciChartSurface.renderableSeries.add(candlestickSeries);
-
-  // Add an Ohlcseries (invisible by default)
-  const ohlcSeries = new FastOhlcRenderableSeries(wasmContext, {
-    dataSeries: candleDataSeries,
-    stroke: appTheme.ForegroundColor,
-    strokeThickness: 1,
-    dataPointWidth: 0.9,
-    strokeUp: appTheme.TV_Green,
-    strokeDown: appTheme.TV_Red,
-    isVisible: false,
-  });
-  sciChartSurface.renderableSeries.add(ohlcSeries);
 
   // Add moving averages
   sciChartSurface.renderableSeries.add(
@@ -63,6 +49,5 @@ export const configureSeries = (
   return {
     candleDataSeries,
     candlestickSeries,
-    ohlcSeries,
   };
 };
