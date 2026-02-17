@@ -8,7 +8,7 @@ import {
   TSciChart,
   Thickness,
 } from "scichart";
-import { appTheme } from "../../styles/theme";
+import { appTheme } from "../../../styles/theme";
 
 export const configureAxes = (
   sciChartSurface: SciChartSurface,

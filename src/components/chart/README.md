@@ -2,46 +2,46 @@
 
 Direktori ini berisi semua logika yang berkaitan dengan implementasi SciChart.
 
-## File Inti
+## Struktur Direktori
 
-Berikut adalah penjelasan fungsi-fungsi yang mungkin membingungkan:
+### `core/` (Inti Grafik)
 
-### `createCandlestickChart.ts`
+- **`ChartBuilder.ts`**: **"Otak"** dari grafik.
+  1.  Inisialisasi `SciChartSurface` (kanvas grafik).
+  2.  Memanggil konfigurasi sumbu, modifier, dan series.
+  3.  Menggabungkan logika data dan kontrol (`ChartData`, `ChartControls`) menjadi satu objek return value.
 
-Ini adalah **"Otak"** dari grafik. File ini berfungsi sebagai:
+- **`ChartInitializer.ts`**: **"Jembatan"** antara React UI (`App.tsx`) dan logika SciChart.
+  1.  Memanggil `ChartBuilder`.
+  2.  Mengambil data historis dari provider terpilih.
+  3.  Mengisi data ke grafik & melakukan subscribe ke WebSocket provider.
 
-1.  Inisialisasi `SciChartSurface` (kanvas grafik).
-2.  Memanggil konfigurasi sumbu (`configureAxes`), modifier (`configureModifiers`), dan series (`configureSeries`).
-3.  Menggabungkan logika data dan kontrol (`ChartData`, `ChartControls`) menjadi satu objek return value.
-    **Tips:** Jika Anda ingin mengubah urutan inisialisasi atau menambah komponen global baru, mulai dari sini.
+### `config/` (Konfigurasi)
 
-### `ChartInitialization.ts`
+- **`Axes.ts`**: Mengatur tampilan sumbu X (Waktu) dan Y (Harga).
+- **`Modifiers.ts`**: Mengatur interaksi pengguna (Zoom, Pan, Selection).
+- **`Series.ts`**: Mengatur tampilan candle stick & indikator.
 
-File ini adalah **"Jembatan"** antara React UI (`App.tsx`) dan logika SciChart.
-Ia menerima `providerId` (misal "binance"), lalu:
+### `features/` (Fitur Tambahan)
 
-1.  Memanggil `createCandlestickChart`.
-2.  Mengambil data historis dari provider terpilih.
-3.  Mengisi data ke grafik.
-4.  Melakukan subscribe ke WebSocket provider untuk update realtime.
+- **`Palette.ts`**: Pewarnaan candle dan volume.
+- **`PriceAnnotation.ts`**: Garis harga terakhir.
+- **`SelectionModifier.ts`**: Logika pemilihan area chart.
 
-### `configureModifiers.ts`
+### `tools/` (Alat Gambar)
 
-Mengatur interaksi pengguna, seperti:
+Berisi logika alat gambar seperti Garis dan Kotak.
 
-- **ZoomPanModifier**: Untuk geser-geser grafik.
-- **PinchZoomModifier**: Untuk zoom cubit di layar sentuh.
-- **MouseWheelZoomModifier**: Zoom pakai scroll mouse.
-- **SelectionModifier**: Custom modifier untuk memilih annotation (klik box/garis).
+### `utils/` (Helper)
 
-## Sub-direktori
+Fungsi pembantu statistik dan manipulasi data.
 
-- **`tools/`**: Berisi logika alat gambar (Garis, Kotak).
-- **`utils/`**: Fungsi pembantu (helper) agar kode utama tidak berantakan.
-- **`templates/`**: Template HTML/SVG untuk tooltip custom.
+### `templates/`
+
+Template HTML/SVG untuk tooltip custom.
 
 ## Cara Maintenance
 
-- **Ubah Tampilan Grafik (Warna Candle, dll)**: Edit `configureSeries.ts`.
-- **Ubah Format Angka/Tanggal Sumbu**: Edit `configureAxes.ts`.
-- **Ubah Perilaku Zoom/Geser**: Edit `configureModifiers.ts`.
+- **Ubah Tampilan Grafik (Warna Candle, dll)**: Edit `config/Series.ts`.
+- **Ubah Format Angka/Tanggal Sumbu**: Edit `config/Axes.ts`.
+- **Ubah Perilaku Zoom/Geser**: Edit `config/Modifiers.ts`.

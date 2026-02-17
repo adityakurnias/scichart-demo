@@ -10,7 +10,7 @@ import {
 } from "scichart";
 import { appTheme } from "../../../styles/theme";
 import { calculateStats } from "./ChartStats";
-import { getStatsTooltipSvg } from "../templates/statsTooltip";
+import { getStatsTooltipSvg } from "../templates/DetailTooltip";
 
 export const attachStatsTooltip = (
   sciChartSurface: SciChartSurface,

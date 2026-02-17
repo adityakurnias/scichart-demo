@@ -6,7 +6,7 @@ import {
   FastLineRenderableSeries,
   XyMovingAverageFilter,
 } from "scichart";
-import { appTheme } from "../../styles/theme";
+import { appTheme } from "../../../styles/theme";
 
 export const configureSeries = (
   sciChartSurface: SciChartSurface,

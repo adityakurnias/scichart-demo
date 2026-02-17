@@ -1,15 +1,15 @@
 import { SciChartSurface } from "scichart";
-import { TPriceBar } from "../../services/binanceRestClient";
-import { appTheme } from "../../styles/theme";
-import { configureAxes } from "./configureAxes";
-import { configureSeries } from "./configureSeries";
-import { configureModifiers } from "./configureModifiers";
-import { PriceAnnotation } from "./PriceAnnotation";
-import { addLineAnnotation } from "./tools/LineAnnotaion";
-import { addBoxAnnotation } from "./tools/BoxAnnotation";
-import { deleteSelectedAnnotations } from "./tools/DeleteAnnotatation";
-import { setData, onNewTrade } from "./utils/ChartData";
-import { setXRange, setTool } from "./utils/ChartControls";
+import { TPriceBar } from "../../../types/types";
+import { appTheme } from "../../../styles/theme";
+import { configureAxes } from "../config/Axes";
+import { configureSeries } from "../config/Series";
+import { configureModifiers } from "../config/Modifiers";
+import { PriceAnnotation } from "../features/PriceAnnotation";
+import { addLineAnnotation } from "../tools/LineAnnotaion";
+import { addBoxAnnotation } from "../tools/BoxAnnotation";
+import { deleteSelectedAnnotations } from "../tools/DeleteAnnotatation";
+import { setData, onNewTrade } from "../utils/ChartData";
+import { setXRange, setTool, toggleCursor } from "../utils/ChartControls";
 
 export const createCandlestickChart = async (
   rootElement: string | HTMLDivElement,
@@ -45,6 +45,7 @@ export const createCandlestickChart = async (
     setXRange: (startDate: Date, endDate: Date) =>
       setXRange(xAxis, startDate, endDate),
     setTool: (tool: string) => setTool(modifiers, tool),
+    toggleCursor: (isEnabled: boolean) => toggleCursor(modifiers, isEnabled),
     addLineAnnotation: () => addLineAnnotation(sciChartSurface, xAxis),
     addBoxAnnotation: () => addBoxAnnotation(sciChartSurface, xAxis),
     deleteSelectedAnnotations: () => deleteSelectedAnnotations(sciChartSurface),

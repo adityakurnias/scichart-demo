@@ -1,6 +1,6 @@
 import { TResolvedReturnType } from "scichart-react";
-import { createCandlestickChart } from "./createCandlestickChart";
-import { CHART_PROVIDERS } from "../../services/ChartProviders";
+import { createCandlestickChart } from "./ChartBuilder";
+import { CHART_PROVIDERS } from "../../../services/ChartProviders";
 
 export const createChartInitializer =
   (providerId: string) => async (rootElement: string | HTMLDivElement) => {

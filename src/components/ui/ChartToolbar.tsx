@@ -17,6 +17,8 @@ import DeleteIcon from "@mui/icons-material/Delete";
 interface ChartToolbarProps {
   activeTool: string;
   onToolChange: (tool: string) => void;
+  isCursorEnabled: boolean;
+  onToggleCursor: () => void;
   onAddLine: () => void;
   onAddBox: () => void;
   onDeleteSelected: () => void;
@@ -25,6 +27,8 @@ interface ChartToolbarProps {
 export const ChartToolbar: React.FC<ChartToolbarProps> = ({
   activeTool,
   onToolChange,
+  isCursorEnabled,
+  onToggleCursor,
   onAddLine,
   onAddBox,
   onDeleteSelected,
@@ -87,22 +91,33 @@ export const ChartToolbar: React.FC<ChartToolbarProps> = ({
             <PanToolIcon />
           </Tooltip>
         </ToggleButton>
-        <ToggleButton value="cursor" aria-label="cursor">
-          <Tooltip title="Cursor" arrow placement={isMobile ? "top" : "right"}>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-            >
-              <path
-                fill="currentColor"
-                d="M11 21v-8H3v-2h8V3h2v8h8v2h-8v8z"
-              />
-            </svg>
-          </Tooltip>
-        </ToggleButton>
       </ToggleButtonGroup>
+
+      <ToggleButton
+        value="cursor"
+        selected={isCursorEnabled}
+        onChange={onToggleCursor}
+        aria-label="cursor"
+        size="small"
+        sx={{
+          color: "rgba(255, 255, 255, 0.5)",
+          "&.Mui-selected": {
+            color: "white",
+            backgroundColor: "rgba(255, 255, 255, 0.1)",
+          },
+        }}
+      >
+        <Tooltip title="Cursor" arrow placement={isMobile ? "top" : "right"}>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+          >
+            <path fill="currentColor" d="M11 21v-8H3v-2h8V3h2v8h8v2h-8v8z" />
+          </svg>
+        </Tooltip>
+      </ToggleButton>
 
       <Divider
         orientation={isMobile ? "vertical" : "horizontal"}

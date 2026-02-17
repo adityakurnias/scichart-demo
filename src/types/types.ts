@@ -19,10 +19,10 @@ export type TRealtimePriceBar = {
   high: number;
   low: number;
   close: number;
-  volume: number; // Total volume
+  volume: number;
   closeTime: number;
-  lastTradeSize: number; // Last trade size
-  lastTradeBuyOrSell: boolean; // When true, buy, else sell
+  lastTradeSize: number;
+  lastTradeBuyOrSell: boolean;
 };
 
 export type TTrade = {

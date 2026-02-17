@@ -1,5 +1,5 @@
 import { SciChartSurface, HorizontalLineAnnotation } from "scichart";
-import { appTheme } from "../../styles/theme";
+import { appTheme } from "../../../styles/theme";
 
 export const PriceAnnotation = (sciChartSurface: SciChartSurface) => {
   const latestPriceAnnotation = new HorizontalLineAnnotation({

@@ -5,7 +5,7 @@ import { SciChartReact, TResolvedReturnType } from "scichart-react";
 import { appTheme } from "./styles/theme";
 import { ChartToolbar } from "./components/ui/ChartToolbar";
 import { CHART_PROVIDERS } from "./services/ChartProviders";
-import { createChartInitializer } from "./components/chart/ChartInitialization";
+import { createChartInitializer } from "./components/chart/core/ChartInitializer";
 import { TPriceBar } from "./types/types";
 
 export default function RealtimeTickingStockCharts() {
@@ -18,12 +18,14 @@ export default function RealtimeTickingStockCharts() {
     ) => void;
     setXRange: (startDate: Date, endDate: Date) => void;
     setTool: (tool: string) => void;
+    toggleCursor: (isEnabled: boolean) => void;
     addLineAnnotation: () => void;
     addBoxAnnotation: () => void;
     deleteSelectedAnnotations: () => void;
   }>(undefined);
   const [providerId, setProviderId] = React.useState<string>("random");
   const [activeTool, setActiveTool] = React.useState<string>("pan");
+  const [isCursorEnabled, setIsCursorEnabled] = React.useState<boolean>(false);
 
   const handleProviderChanged = (event: any) => {
     setProviderId(event.target.value);
@@ -33,6 +35,14 @@ export default function RealtimeTickingStockCharts() {
     setActiveTool(tool);
     if (chartControlsRef.current?.setTool) {
       chartControlsRef.current.setTool(tool);
+    }
+  };
+
+  const handleToggleCursor = () => {
+    const newState = !isCursorEnabled;
+    setIsCursorEnabled(newState);
+    if (chartControlsRef.current?.toggleCursor) {
+      chartControlsRef.current.toggleCursor(newState);
     }
   };
 
@@ -100,6 +110,7 @@ export default function RealtimeTickingStockCharts() {
             const { subscription, controls } = initResult;
             chartControlsRef.current = controls;
             controls.setTool(activeTool);
+            controls.toggleCursor(isCursorEnabled);
 
             return () => {
               subscription.unsubscribe();
@@ -120,6 +131,8 @@ export default function RealtimeTickingStockCharts() {
         <ChartToolbar
           activeTool={activeTool}
           onToolChange={handleToolChange}
+          isCursorEnabled={isCursorEnabled}
+          onToggleCursor={handleToggleCursor}
           onAddLine={() => chartControlsRef.current?.addLineAnnotation()}
           onAddBox={() => chartControlsRef.current?.addBoxAnnotation()}
           onDeleteSelected={() =>

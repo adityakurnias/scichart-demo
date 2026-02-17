@@ -11,9 +11,9 @@ import {
   EHorizontalAnchorPoint,
   EVerticalAnchorPoint,
 } from "scichart";
-import { appTheme } from "../../styles/theme";
-import { calculateStats } from "./utils/ChartStats";
-import { getStatsTooltipSvg } from "./templates/statsTooltip";
+import { appTheme } from "../../../styles/theme";
+import { calculateStats } from "../utils/ChartStats";
+import { getStatsTooltipSvg } from "../templates/DetailTooltip";
 
 export class SelectionModifier extends ChartModifierBase2D {
   public type = "SelectionModifier";
