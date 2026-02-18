@@ -9,6 +9,7 @@ import {
 import { appTheme } from "../../../styles/theme";
 import { calculateCenter } from "../../../utils/calculateCenter";
 import { formatDate, formatPrice } from "../../../utils/formatters";
+import { createAxisMarker } from "../utils/axisMarkers";
 
 export const addBoxAnnotation = (
   sciChartSurface: SciChartSurface,
@@ -34,19 +35,6 @@ export const addBoxAnnotation = (
     isEditable: true,
     annotationLayer: EAnnotationLayer.AboveChart,
   });
-
-  /* Helper to create axis markers */
-  const createAxisMarker = (
-    value: number,
-    formatFunc: (v: number) => string,
-  ) => {
-    return new AxisMarkerAnnotation({
-      fontSize: 10,
-      backgroundColor: appTheme.MutedBlue,
-      color: appTheme.TV_Background,
-      formattedValue: formatFunc(value),
-    });
-  };
 
   const y1Marker = createAxisMarker(y1, formatPrice);
   const y2Marker = createAxisMarker(y2, formatPrice);
