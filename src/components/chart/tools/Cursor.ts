@@ -19,6 +19,7 @@ export const createCursorModifier = () => {
     showRolloverLine: true,
     showAxisLabel: true,
     snapToDataPoint: true,
+    
   });
 
     const legendModifier = new LegendModifier({

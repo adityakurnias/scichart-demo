@@ -26,9 +26,15 @@ export const setTool = (
   switch (tool) {
     case "pan":
       zoomPanModifier.isEnabled = true;
+      selectionModifier.isEnabled = false;
+      break;
+    case "selection":
+      selectionModifier.isEnabled = true;
+      zoomPanModifier.isEnabled = true;
       break;
     default:
       zoomPanModifier.isEnabled = true;
+      selectionModifier.isEnabled = false;
       break;
   }
 };

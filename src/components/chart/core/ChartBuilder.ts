@@ -9,7 +9,7 @@ import { addLineAnnotation } from "../tools/LineAnnotaion";
 import { addBoxAnnotation } from "../tools/BoxAnnotation";
 import { deleteSelectedAnnotations } from "../tools/DeleteAnnotatation";
 import { setData, onNewTrade } from "../utils/ChartData";
-import { setXRange, setTool, toggleCursor } from "../utils/ChartControls";
+import { setXRange, setTool, toggleCursor } from "./ChartControls";
 
 export const createCandlestickChart = async (
   rootElement: string | HTMLDivElement,

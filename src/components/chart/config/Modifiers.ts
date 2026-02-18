@@ -10,7 +10,7 @@ import {
   ELegendOrientation,
   TLegendItem,
 } from "scichart";
-import { SelectionModifier } from "../features/SelectionModifier";
+import { SelectionModifier } from "../tools/Measurment";
 import { createCursorModifier } from "../tools/Cursor";
 import { appTheme } from "../../../styles/theme";
 
