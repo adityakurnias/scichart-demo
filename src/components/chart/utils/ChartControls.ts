@@ -37,6 +37,7 @@ export const toggleCursor = (
   modifiers: { [key: string]: ChartModifierBase2D },
   isEnabled: boolean,
 ) => {
-  const { cursorModifier } = modifiers;
-  cursorModifier.isEnabled = isEnabled;
+  const { cursorModifier, rolloverModifier } = modifiers;
+  if (cursorModifier) cursorModifier.isEnabled = isEnabled;
+  if (rolloverModifier) rolloverModifier.isEnabled = isEnabled;
 };

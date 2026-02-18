@@ -3,7 +3,6 @@ import {
   ZoomPanModifier,
   MouseWheelZoomModifier,
   PinchZoomModifier,
-  CursorModifier,
   AnnotationHoverModifier,
   EXyDirection,
 } from "scichart";
@@ -25,11 +24,17 @@ export const configureModifiers = (sciChartSurface: SciChartSurface) => {
     zoomPanModifier,
     pinchZoomModifier,
     selectionModifier,
-    cursorModifier,
+    cursorModifier.cursorModifier,
+    cursorModifier.rolloverModifier,
 
     new MouseWheelZoomModifier(),
     new AnnotationHoverModifier(),
   );
 
-  return { zoomPanModifier, cursorModifier, selectionModifier };
+  return {
+    zoomPanModifier,
+    cursorModifier: cursorModifier.cursorModifier,
+    rolloverModifier: cursorModifier.rolloverModifier,
+    selectionModifier,
+  };
 };
