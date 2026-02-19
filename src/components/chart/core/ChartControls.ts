@@ -26,7 +26,6 @@ export const setTool = (
   switch (tool) {
     case "pan":
       zoomPanModifier.isEnabled = true;
-      selectionModifier.isEnabled = false;
       break;
     case "selection":
       selectionModifier.isEnabled = true;
@@ -34,7 +33,6 @@ export const setTool = (
       break;
     default:
       zoomPanModifier.isEnabled = true;
-      selectionModifier.isEnabled = false;
       break;
   }
 };
@@ -42,16 +40,12 @@ export const setTool = (
 export const toggleCursor = (
   modifiers: { [key: string]: ChartModifierBase2D },
   isEnabled: boolean,
+  onCursorToggle?: (enabled: boolean) => void,
 ) => {
-  const { cursorModifier, rolloverModifier, legendModifier } = modifiers;
+  const { cursorModifier, rolloverModifier } = modifiers;
   if (cursorModifier) cursorModifier.isEnabled = isEnabled;
   if (rolloverModifier) rolloverModifier.isEnabled = isEnabled;
-  if (legendModifier) legendModifier.isEnabled = isEnabled;
 
-  if (!isEnabled) {
-    const legendEl = document.getElementById("legend-ohlc-value");
-    if (legendEl) {
-      legendEl.innerHTML = "";
-    }
-  }
+  // Notify React so ChartLegend can hide itself when cursor is off
+  onCursorToggle?.(isEnabled);
 };

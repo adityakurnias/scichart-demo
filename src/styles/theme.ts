@@ -1,13 +1,75 @@
 import { IThemeProvider, SciChartJsNavyTheme } from "scichart";
+import { createTheme } from "@mui/material/styles";
 
+// ── TradingView Palette Constants ────────────────────────────────────────────
+export const TV = {
+  Background: "#131722", // App/chart bg      → $color-bg
+  Surface: "#1e222d", // Panel/card bg      → $color-surface
+  Border: "#2a2e39", // Grid / dividers    → $color-border
+  TextPrimary: "#d1d4dc", //                    → $color-text-primary
+  TextMuted: "#787b86", // Axis labels        → $color-text-secondary
+  Blue: "#2962ff", // Accent / links     → $color-blue
+  BlueLight: "#4e7eff",
+  BlueDark: "#1e53e5",
+  Green: "#089981", // Bullish candle     → $color-green
+  Red: "#f23645", // Bearish candle     → $color-red
+} as const;
+
+// ── MUI Theme (used by ThemeProvider in App.tsx) ─────────────────────────────
+export const muiTheme = createTheme({
+  palette: {
+    mode: "dark",
+    background: {
+      default: TV.Background,
+      paper: TV.Surface,
+    },
+    divider: TV.Border,
+    text: {
+      primary: TV.TextPrimary,
+      secondary: TV.TextMuted,
+    },
+    primary: {
+      main: TV.Blue,
+      light: TV.BlueLight,
+      dark: TV.BlueDark,
+    },
+    success: { main: TV.Green },
+    error: { main: TV.Red },
+  },
+  shape: { borderRadius: 4 },
+  typography: {
+    fontFamily: [
+      "-apple-system",
+      "BlinkMacSystemFont",
+      '"Segoe UI"',
+      "Roboto",
+      '"Helvetica Neue"',
+      "Arial",
+      "sans-serif",
+    ].join(","),
+  },
+  components: {
+    MuiPaper: {
+      styleOverrides: {
+        root: { backgroundImage: "none" }, // remove MUI dark mode gradient
+      },
+    },
+    MuiTableCell: { styleOverrides: { root: { borderColor: TV.Border } } },
+    MuiSelect: { styleOverrides: { root: { borderColor: TV.Border } } },
+    MuiOutlinedInput: {
+      styleOverrides: { notchedOutline: { borderColor: TV.Border } },
+    },
+    MuiMenuItem: {
+      styleOverrides: { root: { "&:hover": { backgroundColor: TV.Border } } },
+    },
+  },
+});
+
+// ── SciChart App Theme (used by chart components) ────────────────────────────
 export interface AppThemeBase {
   SciChartJsTheme: IThemeProvider;
-
-  // general colors
   ForegroundColor: string;
   Background: string;
-
-  // Series colors
   VividSkyBlue: string;
   VividPink: string;
   VividTeal: string;
@@ -16,7 +78,6 @@ export interface AppThemeBase {
   VividPurple: string;
   VividGreen: string;
   VividRed: string;
-
   MutedSkyBlue: string;
   MutedPink: string;
   MutedTeal: string;
@@ -24,7 +85,6 @@ export interface AppThemeBase {
   MutedBlue: string;
   MutedPurple: string;
   MutedRed: string;
-
   PaleSkyBlue: string;
   PalePink: string;
   PaleTeal: string;
@@ -36,52 +96,58 @@ export interface AppThemeBase {
 export class SciChart2022AppTheme implements AppThemeBase {
   SciChartJsTheme = new SciChartJsNavyTheme();
 
-  TV_Background = "#131722";
-  TV_Grid = "#242835";
-  TV_Green = "#089981";
-  TV_Red = "#F23645";
-  TV_Cursor = "#9598A1";
-  LegendText = "#787B86";
+  // Core TV colors (reference the shared TV object)
+  TV_Background = TV.Background;
+  TV_Surface = TV.Surface;
+  TV_Grid = TV.Border;
+  TV_Green = TV.Green;
+  TV_Red = TV.Red;
+  TV_Blue = TV.Blue;
+  TV_Cursor = TV.TextMuted;
+  LegendText = TV.TextMuted;
 
-  ForegroundColor = "#D1D4DC";
-  Background = this.TV_Background;
+  ForegroundColor = TV.TextPrimary;
+  Background = TV.Background;
 
-  VividSkyBlue = "#50C7E0";
-  VividPink = "#EC0F6C";
-  VividTeal = "#30BC9A";
-  VividOrange = "#F48420";
-  VividBlue = "#364BA0";
-  VividPurple = "#882B91";
-  VividGreen = this.TV_Green;
-  VividRed = this.TV_Red;
+  /** @deprecated Use TV_Surface */ DarkIndigo = TV.Surface;
+  /** @deprecated Use TV_Blue   */ Indigo = TV.Blue;
 
-  DarkIndigo = "#14233C";
-  Indigo = "#264B93";
+  // Vivid series colors
+  VividSkyBlue = TV.Blue;
+  VividPink = "#e040fb";
+  VividTeal = "#00bcd4";
+  VividOrange = "#ff9800";
+  VividBlue = TV.Blue;
+  VividPurple = "#aa00ff";
+  VividGreen = TV.Green;
+  VividRed = TV.Red;
 
-  MutedSkyBlue = "#83D2F5";
-  MutedPink = "#DF69A8";
-  MutedTeal = "#7BCAAB";
-  MutedOrange = "#E7C565";
-  MutedBlue = "#537ABD";
-  MutedPurple = "#A16DAE";
-  MutedRed = "#DC7969";
+  // Muted series colors
+  MutedSkyBlue = "#83d2f5";
+  MutedPink = "#df69a8";
+  MutedTeal = "#7bcaab";
+  MutedOrange = "#e7c565";
+  MutedBlue = "#537abd";
+  MutedPurple = "#a16dae";
+  MutedRed = "#dc7969";
 
-  PaleSkyBlue = "#E4F5FC";
-  PalePink = "#EEB3D2";
-  PaleTeal = "#B9E0D4";
-  PaleOrange = "#F1CFB5";
-  PaleBlue = "#B5BEDF";
-  PalePurple = "#CFB4D5";
+  // Pale series colors
+  PaleSkyBlue = "#e4f5fc";
+  PalePink = "#eeb3d2";
+  PaleTeal = "#b9e0d4";
+  PaleOrange = "#f1cfb5";
+  PaleBlue = "#b5bedf";
+  PalePurple = "#cfb4d5";
 
   get TradingViewTheme(): IThemeProvider {
     const theme = new SciChartJsNavyTheme();
-    theme.sciChartBackground = this.TV_Background;
-    theme.loadingAnimationBackground = this.TV_Background;
-    theme.gridBackgroundBrush = this.TV_Background;
-    theme.majorGridLineBrush = this.TV_Grid;
-    theme.minorGridLineBrush = this.TV_Grid;
+    theme.sciChartBackground = TV.Background;
+    theme.loadingAnimationBackground = TV.Background;
+    theme.gridBackgroundBrush = TV.Background;
+    theme.majorGridLineBrush = TV.Border;
+    theme.minorGridLineBrush = TV.Border;
     theme.axisBorder = "Transparent";
-    theme.tickTextBrush = "#787B86"; // TradingView specific axis label color
+    theme.tickTextBrush = TV.TextMuted;
     return theme;
   }
 }

@@ -63,9 +63,10 @@ export const ChartToolbar: React.FC<ChartToolbarProps> = ({
         flexDirection: isMobile ? "row" : "column",
         justifyContent: isMobile ? "space-around" : "center",
         alignItems: "center",
-        backgroundColor: "#131722",
+        backgroundColor: "background.default",
         padding: isMobile ? "10px 0" : "10px 5px",
-        borderRight: isMobile ? "none" : "1px solid #2B2B43",
+        borderRight: isMobile ? "none" : "1px solid",
+        borderColor: isMobile ? "transparent" : "divider",
         gap: isMobile ? 0 : 1,
         boxShadow: "none",
       }}
@@ -181,7 +182,7 @@ export const ChartToolbar: React.FC<ChartToolbarProps> = ({
           arrow
           placement={isMobile ? "top" : "right"}
         >
-          <IconButton onClick={onDeleteSelected} sx={{ color: "#F23645" }}>
+          <IconButton onClick={onDeleteSelected} sx={{ color: "error.main" }}>
             <DeleteIcon />
           </IconButton>
         </Tooltip>

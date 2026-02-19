@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Box, Button, IconButton, Tooltip } from "@mui/material";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 
+import { appTheme } from "../../styles/theme";
+
 interface TimeRange {
   from: number;
   to: number;
@@ -37,7 +39,7 @@ export const TimeFrameSelector: React.FC<TimeFrameSelectorProps> = ({
         display: "flex",
         alignItems: "center",
         gap: 0.5,
-        backgroundColor: "#131722", 
+        backgroundColor: appTheme.Background,
         padding: "4px 8px",
         borderRadius: "4px",
       }}
@@ -51,12 +53,15 @@ export const TimeFrameSelector: React.FC<TimeFrameSelectorProps> = ({
           sx={{
             minWidth: "auto",
             padding: "4px 8px",
-            color: selectedPeriod === period.label ? "#2962FF" : "#B2B5BE",
+            color:
+              selectedPeriod === period.label
+                ? appTheme.VividBlue
+                : appTheme.LegendText,
             fontWeight: selectedPeriod === period.label ? "bold" : "normal",
             fontSize: "13px",
             "&:hover": {
-              color: "#2962FF",
-              backgroundColor: "rgba(41, 98, 255, 0.08)",
+              color: appTheme.VividBlue,
+              backgroundColor: "rgba(41, 98, 255, 0.08)", // Keep opacity helper or move to theme if possible
             },
             textTransform: "none",
           }}

@@ -10,19 +10,23 @@ import { addBoxAnnotation } from "../tools/BoxAnnotation";
 import { deleteSelectedAnnotations } from "../tools/DeleteAnnotatation";
 import { setData, onNewTrade } from "../utils/ChartData";
 import { setXRange, setTool, toggleCursor } from "./ChartControls";
+import { OhlcLegendData } from "../../ui/ChartLegend";
 
 export const createCandlestickChart = async (
   rootElement: string | HTMLDivElement,
+  onOhlcUpdate: (data: OhlcLegendData | null) => void,
 ) => {
   const { sciChartSurface, wasmContext } = await SciChartSurface.create(
     rootElement,
-    {
-      theme: appTheme.TradingViewTheme,
-    },
+    { theme: appTheme.TradingViewTheme },
   );
 
   const { xAxis } = configureAxes(sciChartSurface, wasmContext);
-  const { candleDataSeries } = configureSeries(sciChartSurface, wasmContext);
+  const { candleDataSeries } = configureSeries(
+    sciChartSurface,
+    wasmContext,
+    onOhlcUpdate,
+  );
   const modifiers = configureModifiers(sciChartSurface);
   const { latestPriceAnnotation } = PriceAnnotation(sciChartSurface);
 
@@ -45,14 +49,12 @@ export const createCandlestickChart = async (
     setXRange: (startDate: Date, endDate: Date) =>
       setXRange(xAxis, startDate, endDate),
     setTool: (tool: string) => setTool(modifiers, tool),
-    toggleCursor: (isEnabled: boolean) => toggleCursor(modifiers, isEnabled),
+    toggleCursor: (isEnabled: boolean, onToggle?: (e: boolean) => void) =>
+      toggleCursor(modifiers, isEnabled, onToggle),
     addLineAnnotation: () => addLineAnnotation(sciChartSurface, xAxis),
     addBoxAnnotation: () => addBoxAnnotation(sciChartSurface, xAxis),
     deleteSelectedAnnotations: () => deleteSelectedAnnotations(sciChartSurface),
   };
 
-  return {
-    sciChartSurface,
-    controls,
-  };
+  return { sciChartSurface, controls };
 };
