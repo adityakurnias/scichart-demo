@@ -16,7 +16,7 @@ interface TimeFrameSelectorProps {
 
 const PERIODS = [
   { label: "1D", days: 1 },
-  { label: "7D", days: 7 },
+  { label: "5D", days: 5 },
   { label: "1M", months: 1 },
   { label: "6M", months: 6 },
   { label: "YTD", ytd: true },
