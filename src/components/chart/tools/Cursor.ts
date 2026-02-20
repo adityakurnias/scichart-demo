@@ -1,10 +1,6 @@
 import { CursorModifier, RolloverModifier } from "scichart";
 import { appTheme } from "../../../styles/theme";
 
-/**
- * Creates cursor (crosshair) and rollover modifiers.
- * LegendModifier removed — legend is now a React component (ChartLegend.tsx).
- */
 export const createCursorModifier = () => {
   const cursorModifier = new CursorModifier({
     crosshairStroke: appTheme.TV_Cursor,

@@ -16,11 +16,11 @@ import {
 import { appTheme } from "../../../styles/theme";
 import { calculateStats } from "../utils/ChartStats";
 import { getMeasurementTooltip } from "../templates/DetailTooltip";
-import { createAxisMarker } from "../utils/axisMarkers";
+import { createAxisMarker } from "../utils/AxisMarkers";
 import { formatDate, formatPrice } from "../../../utils/formatters";
 
-export class SelectionModifier extends ChartModifierBase2D {
-  public type = "SelectionModifier";
+export class Measurment extends ChartModifierBase2D {
+  public type = "Measurment";
   private startPoint: Point | undefined;
 
   private activeBox: BoxAnnotation | undefined;

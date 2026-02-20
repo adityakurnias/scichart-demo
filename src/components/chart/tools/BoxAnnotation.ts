@@ -9,7 +9,7 @@ import {
 import { appTheme } from "../../../styles/theme";
 import { calculateCenter } from "../../../utils/calculateCenter";
 import { formatDate, formatPrice } from "../../../utils/formatters";
-import { createAxisMarker } from "../utils/axisMarkers";
+import { createAxisMarker } from "../utils/AxisMarkers";
 
 export const addBoxAnnotation = (
   sciChartSurface: SciChartSurface,

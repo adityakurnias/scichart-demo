@@ -6,27 +6,30 @@ import {
   AnnotationHoverModifier,
   EXyDirection,
 } from "scichart";
-import { SelectionModifier } from "../tools/Measurment";
+import { Measurment } from "../tools/Measurment";
 import { createCursorModifier } from "../tools/Cursor";
 
 export const configureModifiers = (sciChartSurface: SciChartSurface) => {
   const zoomPanModifier = new ZoomPanModifier({ enableZoom: true });
   const pinchZoomModifier = new PinchZoomModifier({
-    xyDirection: EXyDirection.XDirection,
+    xyDirection: EXyDirection.XyDirection,
+  });
+  const mouseWheelZoomModifier = new MouseWheelZoomModifier({
+    xyDirection: EXyDirection.XyDirection,
   });
   const cursorModifier = createCursorModifier();
 
   (pinchZoomModifier as any).scaleFactor = 0.0005;
 
-  const selectionModifier = new SelectionModifier();
+  const measurmentModifier = new Measurment();
 
   sciChartSurface.chartModifiers.add(
     zoomPanModifier,
     pinchZoomModifier,
-    selectionModifier,
+    mouseWheelZoomModifier,
+    measurmentModifier,
     cursorModifier.cursorModifier,
     cursorModifier.rolloverModifier,
-    new MouseWheelZoomModifier({ xyDirection: EXyDirection.XyDirection }),
     new AnnotationHoverModifier(),
   );
 
@@ -34,6 +37,6 @@ export const configureModifiers = (sciChartSurface: SciChartSurface) => {
     zoomPanModifier,
     cursorModifier: cursorModifier.cursorModifier,
     rolloverModifier: cursorModifier.rolloverModifier,
-    selectionModifier,
+    measurmentModifier,
   };
 };

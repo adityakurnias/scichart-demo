@@ -18,17 +18,17 @@ export const setTool = (
   modifiers: { [key: string]: ChartModifierBase2D },
   tool: string,
 ) => {
-  const { zoomPanModifier, selectionModifier } = modifiers;
+  const { zoomPanModifier, measurmentModifier } = modifiers;
 
   zoomPanModifier.isEnabled = false;
-  selectionModifier.isEnabled = false;
+  measurmentModifier.isEnabled = false;
 
   switch (tool) {
     case "pan":
       zoomPanModifier.isEnabled = true;
       break;
-    case "selection":
-      selectionModifier.isEnabled = true;
+    case "measurement":
+      measurmentModifier.isEnabled = true;
       zoomPanModifier.isEnabled = true;
       break;
     default:

@@ -55,7 +55,6 @@ export const getMeasurementTooltip = (stats: Stats) => {
       <text x="75" y="56" font-size="12" font-family="Roboto, sans-serif" fill="white" text-anchor="middle" dominant-baseline="middle">
         Vol ${volume}
       </text>
-      <polygon points="70,65 80,65 75,70" fill="#2962FF" />
     </svg>
   `;
 };

@@ -94,8 +94,8 @@ export const ChartToolbar: React.FC<ChartToolbarProps> = ({
           </Tooltip>
         </ToggleButton>
         <ToggleButton
-          value="selection"
-          aria-label="selection"
+          value="measurement"
+          aria-label="measurement"
           sx={{ color: "white" }}
         >
           <HighlightAltIcon />
