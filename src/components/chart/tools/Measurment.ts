@@ -2,7 +2,6 @@ import {
   ChartModifierBase2D,
   ModifierMouseArgs,
   Point,
-  EExecuteOn,
   BoxAnnotation,
   ECoordinateMode,
   EAnnotationLayer,
@@ -16,7 +15,11 @@ import {
 import { appTheme } from "../../../styles/theme";
 import { calculateStats } from "../utils/ChartStats";
 import { getMeasurementTooltip } from "../templates/DetailTooltip";
-import { createAxisMarker } from "../utils/AxisMarkers";
+import {
+  createAxisMarker,
+  updateXAxisMarker,
+  updateYAxisMarker,
+} from "../utils/Custom/AxisMarkersCustom";
 import { formatDate, formatPrice } from "../../../utils/formatters";
 
 export class Measurment extends ChartModifierBase2D {
@@ -36,8 +39,14 @@ export class Measurment extends ChartModifierBase2D {
   private y1Marker: AxisMarkerAnnotation | undefined;
   private y2Marker: AxisMarkerAnnotation | undefined;
 
+  private isBearish: boolean = false;
+
   constructor() {
     super();
+  }
+
+  private getDragColor(isBearish: boolean): string {
+    return isBearish ? appTheme.TV_Red : appTheme.VividSkyBlue;
   }
 
   public modifierMouseDown(args: ModifierMouseArgs): void {
@@ -45,9 +54,10 @@ export class Measurment extends ChartModifierBase2D {
 
     if (this.isEnabled && args.mousePoint) {
       this.startPoint = args.mousePoint;
+      this.isBearish = false;
       this.clearSelection();
 
-      const themeColor = appTheme.VividSkyBlue;
+      const themeColor = this.getDragColor(false);
       const sx = this.startPoint.x;
       const sy = this.startPoint.y;
 
@@ -80,7 +90,6 @@ export class Measurment extends ChartModifierBase2D {
         annotationLayer: EAnnotationLayer.AboveChart,
       });
 
-      // Set posisi awal arrow agar tidak muncul di (0,0)
       this.hArrow = new CustomAnnotation({
         xCoordinateMode: ECoordinateMode.Pixel,
         yCoordinateMode: ECoordinateMode.Pixel,
@@ -109,21 +118,43 @@ export class Measurment extends ChartModifierBase2D {
       const yCalc = this.parentSurface.yAxes
         .get(0)
         .getCurrentCoordinateCalculator();
-
       const xVal = xCalc.getDataValue(sx);
       const yVal = yCalc.getDataValue(sy);
 
-      this.x1Marker = createAxisMarker(xVal, formatDate, true);
-      this.x2Marker = createAxisMarker(xVal, formatDate, true);
-      this.y1Marker = createAxisMarker(yVal, formatPrice, false);
-      this.y2Marker = createAxisMarker(yVal, formatPrice, false);
+      this.x1Marker = createAxisMarker(
+        xVal,
+        formatDate,
+        true,
+        "start",
+        themeColor,
+      );
+      this.x2Marker = createAxisMarker(
+        xVal,
+        formatDate,
+        true,
+        "end",
+        themeColor,
+      );
+      this.y1Marker = createAxisMarker(
+        yVal,
+        formatPrice,
+        false,
+        "start",
+        themeColor,
+      );
+      this.y2Marker = createAxisMarker(
+        yVal,
+        formatPrice,
+        false,
+        "end",
+        themeColor,
+      );
 
       this.parentSurface.annotations.add(this.activeBox);
       this.parentSurface.annotations.add(this.hLine);
       this.parentSurface.annotations.add(this.vLine);
       this.parentSurface.annotations.add(this.hArrow);
       this.parentSurface.annotations.add(this.vArrow);
-
       this.parentSurface.annotations.add(this.x1Marker);
       this.parentSurface.annotations.add(this.x2Marker);
       this.parentSurface.annotations.add(this.y1Marker);
@@ -147,17 +178,24 @@ export class Measurment extends ChartModifierBase2D {
       const cx = args.mousePoint.x;
       const cy = args.mousePoint.y;
 
+      const isBearish = cy > sy;
+      this.isBearish = isBearish;
+      const themeColor = this.getDragColor(isBearish);
+
+      this.activeBox.fill = themeColor + "33";
+      this.activeBox.stroke = themeColor;
       this.activeBox.x2 = cx;
       this.activeBox.y2 = cy;
+
+      this.hLine.stroke = themeColor;
+      this.vLine.stroke = themeColor;
 
       const minX = Math.min(sx, cx);
       const maxX = Math.max(sx, cx);
       const minY = Math.min(sy, cy);
       const maxY = Math.max(sy, cy);
-
       const midX = minX + (maxX - minX) / 2;
       const midY = minY + (maxY - minY) / 2;
-
       const isRight = cx >= sx;
       const isDown = cy >= sy;
 
@@ -165,27 +203,19 @@ export class Measurment extends ChartModifierBase2D {
       this.hLine.x2 = maxX;
       this.hLine.y1 = midY;
       this.hLine.y2 = midY;
-
       this.vLine.x1 = midX;
       this.vLine.x2 = midX;
       this.vLine.y1 = minY;
       this.vLine.y2 = maxY;
 
-      const themeColor = appTheme.VividSkyBlue;
-      const arrowSize = -10;
-      const halfArrow = arrowSize / 2;
-
+      const halfArrow = -5;
       this.hArrow.x1 = isRight ? maxX + halfArrow : minX - halfArrow;
       this.hArrow.y1 = midY;
-
-      const hRot = isRight ? 0 : 180;
-      this.hArrow.svgString = this.getArrowSVG(themeColor, hRot);
+      this.hArrow.svgString = this.getArrowSVG(themeColor, isRight ? 0 : 180);
 
       this.vArrow.x1 = midX;
       this.vArrow.y1 = isDown ? maxY + halfArrow : minY - halfArrow;
-
-      const vRot = isDown ? 90 : 270;
-      this.vArrow.svgString = this.getArrowSVG(themeColor, vRot);
+      this.vArrow.svgString = this.getArrowSVG(themeColor, isDown ? 90 : 270);
 
       const xCalc = this.parentSurface.xAxes
         .get(0)
@@ -200,21 +230,29 @@ export class Measurment extends ChartModifierBase2D {
       const y2Val = yCalc.getDataValue(maxY);
 
       if (this.x1Marker && this.x2Marker && this.y1Marker && this.y2Marker) {
-        this.x1Marker.x1 = x1Val;
-        this.x1Marker.formattedValue = formatDate(x1Val);
-        this.x2Marker.x1 = x2Val;
-        this.x2Marker.formattedValue = formatDate(x2Val);
-        this.y1Marker.y1 = y1Val;
-        this.y1Marker.formattedValue = formatPrice(y1Val);
-        this.y2Marker.y1 = y2Val;
-        this.y2Marker.formattedValue = formatPrice(y2Val);
+        updateXAxisMarker(
+          this.x1Marker,
+          x1Val,
+          formatDate,
+          themeColor,
+          "start",
+        );
+        updateXAxisMarker(this.x2Marker, x2Val, formatDate, themeColor, "end");
+        updateYAxisMarker(
+          this.y1Marker,
+          y1Val,
+          formatPrice,
+          themeColor,
+          "start",
+        );
+        updateYAxisMarker(this.y2Marker, y2Val, formatPrice, themeColor, "end");
       }
 
-      this.updateSmartTooltip(this.activeBox);
+      this.updateSmartTooltip(this.activeBox, undefined, isBearish);
     }
 
     if (!this.startPoint && this.activeBox) {
-      this.updateSmartTooltip(this.activeBox);
+      this.updateSmartTooltip(this.activeBox, undefined, this.isBearish);
     }
   }
 
@@ -229,7 +267,7 @@ export class Measurment extends ChartModifierBase2D {
 
       if (dist < 20 && this.activeBox) {
         this.clearSelection();
-        this.updateSmartTooltip(undefined, args.mousePoint);
+        this.updateSmartTooltip(undefined, args.mousePoint, false);
       } else if (this.activeBox) {
         const xCalc = this.parentSurface.xAxes
           .get(0)
@@ -237,7 +275,6 @@ export class Measurment extends ChartModifierBase2D {
         const yCalc = this.parentSurface.yAxes
           .get(0)
           .getCurrentCoordinateCalculator();
-
         const toDataX = (pix: number) => xCalc.getDataValue(pix);
         const toDataY = (pix: number) => yCalc.getDataValue(pix);
 
@@ -261,7 +298,9 @@ export class Measurment extends ChartModifierBase2D {
           }
         });
 
-        this.updateSmartTooltip(this.activeBox);
+        const isBearish = this.isBearish;
+        const color = this.getDragColor(isBearish);
+        this.updateSmartTooltip(this.activeBox, undefined, isBearish);
 
         const box = this.activeBox;
         const x1M = this.x1Marker;
@@ -271,14 +310,10 @@ export class Measurment extends ChartModifierBase2D {
 
         if (box && x1M && x2M && y1M && y2M) {
           const updateMarkers = () => {
-            x1M.x1 = box.x1;
-            x1M.formattedValue = formatDate(box.x1);
-            x2M.x1 = box.x2;
-            x2M.formattedValue = formatDate(box.x2);
-            y1M.y1 = box.y1;
-            y1M.formattedValue = formatPrice(box.y1);
-            y2M.y1 = box.y2;
-            y2M.formattedValue = formatPrice(box.y2);
+            updateXAxisMarker(x1M, box.x1, formatDate, color, "start");
+            updateXAxisMarker(x2M, box.x2, formatDate, color, "end");
+            updateYAxisMarker(y1M, box.y1, formatPrice, color, "start");
+            updateYAxisMarker(y2M, box.y2, formatPrice, color, "end");
           };
 
           const onSelected = () => {
@@ -343,6 +378,7 @@ export class Measurment extends ChartModifierBase2D {
   private updateSmartTooltip(
     box: BoxAnnotation | undefined,
     fallbackPoint?: Point,
+    isBearish: boolean = false,
   ) {
     if (!box && !fallbackPoint) return;
 
@@ -353,7 +389,8 @@ export class Measurment extends ChartModifierBase2D {
       .get(0)
       .getCurrentCoordinateCalculator();
 
-    let x1Data, x2Data, x1Pix, x2Pix, y1Pix, y2Pix;
+    let x1Data: number, x2Data: number;
+    let x1Pix: number, x2Pix: number, y1Pix: number, y2Pix: number;
 
     if (box) {
       if (box.xCoordinateMode === ECoordinateMode.DataValue) {
@@ -375,32 +412,29 @@ export class Measurment extends ChartModifierBase2D {
       x1Pix = x2Pix = fallbackPoint.x;
       y1Pix = y2Pix = fallbackPoint.y;
       x1Data = x2Data = xCalc.getDataValue(fallbackPoint.x);
+    } else {
+      return;
     }
 
-    const minX = Math.min(x1Pix, x2Pix);
-    const maxX = Math.max(x1Pix, x2Pix);
-    const minY = Math.min(y1Pix, y2Pix);
-    const maxY = Math.max(y1Pix, y2Pix);
+    const minX = Math.min(x1Pix!, x2Pix!);
+    const maxX = Math.max(x1Pix!, x2Pix!);
+    const minY = Math.min(y1Pix!, y2Pix!);
+    const maxY = Math.max(y1Pix!, y2Pix!);
 
     let targetX = minX + (maxX - minX) / 2;
     let targetY = minY;
-
     let vAnchor = EVerticalAnchorPoint.Bottom;
     let hAnchor = EHorizontalAnchorPoint.Center;
 
     const viewWidth = this.parentSurface.seriesViewRect.width;
-
-    const tooltipEstHeight = 60;
-    const tooltipEstHalfWidth = 100;
-
-    if (targetY - tooltipEstHeight < 0) {
+    if (targetY - 60 < 0) {
       targetY = maxY;
       vAnchor = EVerticalAnchorPoint.Top;
     }
-    if (targetX - tooltipEstHalfWidth < 0) {
+    if (targetX - 100 < 0) {
       targetX = minX;
       hAnchor = EHorizontalAnchorPoint.Left;
-    } else if (targetX + tooltipEstHalfWidth > viewWidth) {
+    } else if (targetX + 100 > viewWidth) {
       targetX = maxX;
       hAnchor = EHorizontalAnchorPoint.Right;
     }
@@ -410,8 +444,8 @@ export class Measurment extends ChartModifierBase2D {
 
     const stats = calculateStats(
       renderableSeries.dataSeries as OhlcDataSeries,
-      Math.min(x1Data, x2Data),
-      Math.max(x1Data, x2Data),
+      Math.min(x1Data!, x2Data!),
+      Math.max(x1Data!, x2Data!),
     );
     if (!stats) return;
 
@@ -425,7 +459,7 @@ export class Measurment extends ChartModifierBase2D {
         y1: targetY - yPadding,
         verticalAnchorPoint: vAnchor,
         horizontalAnchorPoint: hAnchor,
-        svgString: getMeasurementTooltip(stats),
+        svgString: getMeasurementTooltip(stats, isBearish),
         annotationLayer: EAnnotationLayer.AboveChart,
       });
       this.parentSurface.annotations.add(this.statsTooltip);
@@ -434,14 +468,13 @@ export class Measurment extends ChartModifierBase2D {
       this.statsTooltip.y1 = targetY - yPadding;
       this.statsTooltip.verticalAnchorPoint = vAnchor;
       this.statsTooltip.horizontalAnchorPoint = hAnchor;
-      this.statsTooltip.svgString = getMeasurementTooltip(stats);
+      this.statsTooltip.svgString = getMeasurementTooltip(stats, isBearish);
     }
   }
 
   private getArrowSVG(color: string, rotation: number): string {
     return `<svg width="10" height="10" overflow="visible" viewBox="0 0 10 10">
-    <polygon points="0,0 10,5 0,10" fill="${color}" 
-      transform="rotate(${rotation} 5 5)"/>
-  </svg>`;
+      <polygon points="0,0 10,5 0,10" fill="${color}" transform="rotate(${rotation} 5 5)"/>
+    </svg>`;
   }
 }
