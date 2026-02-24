@@ -21,7 +21,7 @@ export const TimeFrameSelectorMobile: React.FC<TimeFrameSelectorProps> = ({
         alignItems: "center",
         gap: 1,
         backgroundColor: appTheme.Background,
-        padding: "8px 12px",
+        padding: "2px 4px",
         borderRadius: "4px",
         overflowX: "auto",
         "&::-webkit-scrollbar": {
@@ -37,13 +37,13 @@ export const TimeFrameSelectorMobile: React.FC<TimeFrameSelectorProps> = ({
           onClick={() => handlePeriodClick(period)}
           sx={{
             minWidth: "auto",
-            padding: "8px 12px",
+            padding: "2px 4px",
             color:
               selectedPeriod === period.label
                 ? appTheme.VividBlue
                 : appTheme.LegendText,
             fontWeight: selectedPeriod === period.label ? "bold" : "normal",
-            fontSize: "14px",
+            fontSize: "12px",
             "&:hover": {
               color: appTheme.VividBlue,
               backgroundColor: "rgba(41, 98, 255, 0.08)",

@@ -30,7 +30,7 @@ export const configureAxes = (
     },
     labelStyle: {
       color: "#787B86",
-      fontSize: 12,
+      fontSize: 10,
     },
     visibleRangeSizeLimit: new NumberRange(60, 300_000_000),
   });
@@ -52,7 +52,7 @@ export const configureAxes = (
     },
     labelStyle: {
       color: "#787B86",
-      fontSize: 12,
+      fontSize: 10,
     },
     allowFastMath: true,
   });

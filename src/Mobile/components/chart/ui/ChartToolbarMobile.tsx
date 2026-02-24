@@ -43,7 +43,7 @@ export const ChartToolbarMobile: React.FC<ChartToolbarProps> = ({
         justifyContent: "space-around",
         alignItems: "center",
         backgroundColor: "background.default",
-        padding: "10px 0",
+        padding: "5px 0",
         borderRight: "none",
         borderColor: "transparent",
         gap: 0,
