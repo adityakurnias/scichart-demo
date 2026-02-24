@@ -206,7 +206,6 @@ export class Measurment extends ChartModifierBase2D {
       group.deleteBtn.isHidden = !isHovered;
 
       if (isHovered) {
-        // Top-right corner of box
         group.deleteBtn.x1 = maxX - 16;
         group.deleteBtn.y1 = minY + 16;
       }
@@ -413,7 +412,6 @@ export class Measurment extends ChartModifierBase2D {
       "end",
     );
 
-    // Update active (in-progress) tooltip
     this.updateActiveTooltip(
       minX,
       maxX,

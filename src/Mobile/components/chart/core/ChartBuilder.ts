@@ -1,20 +1,23 @@
-//? this code do like a compiler on youre fckin C++
-//? every customization that we've made on ../chart/config it will be 1 combined components
+//? Mobile-specific chart builder
+//? Uses Mobile config for Axes/Modifiers, Desktop for Series/PriceAnnotation/tools/utils
 
 import { SciChartSurface } from "scichart";
 import { TPriceBar } from "../../../../Shared/types/types";
 import { appTheme } from "../../../../Shared/styles/theme";
 import { configureAxes } from "../config/Axes";
-import { configureSeries } from "../config/Series";
+import { configureSeries } from "../../../../Desktop/components/chart/config/Series";
 import { configureModifiers } from "../config/Modifiers";
-import { PriceAnnotation } from "../config/PriceAnnotation";
-import { addLineAnnotation } from "../tools/LineAnnotation";
-import { addBoxAnnotation } from "../tools/BoxAnnotation";
-import { deleteSelectedAnnotations } from "../tools/DeleteAnnotation";
-import { setData, onNewTrade } from "../utils/ChartData";
+import { PriceAnnotation } from "../../../../Desktop/components/chart/config/PriceAnnotation";
+import { addLineAnnotation } from "../../../../Desktop/components/chart/tools/LineAnnotation";
+import { addBoxAnnotation } from "../../../../Desktop/components/chart/tools/BoxAnnotation";
+import { deleteSelectedAnnotations } from "../../../../Desktop/components/chart/tools/DeleteAnnotation";
+import {
+  setData,
+  onNewTrade,
+} from "../../../../Desktop/components/chart/utils/ChartData";
 import { setXRange, setTool } from "./ChartControls";
 import { OhlcLegendData } from "../../../../Shared/hooks/useChartLegend";
-import { AnnotationSelectionCallback } from "../utils/AnnotationSelection";
+import { AnnotationSelectionCallback } from "../../../../Desktop/components/chart/utils/AnnotationSelection";
 
 export const createCandlestickChart = async (
   rootElement: string | HTMLDivElement,

@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { OhlcLegendData } from "./useChartLegend";
 import { TPriceBar } from "../types/types";
-import { createChartInitializer } from "../../Desktop/components/chart/core/ChartAllPeriod";
+import { createChartInitializer as createDesktopInitializer } from "../../Desktop/components/chart/core/ChartAllPeriod";
+import { createChartInitializer as createMobileInitializer } from "../../Mobile/components/chart/core/ChartAllPeriod";
 
-export function useTradePage() {
+export function useTradePage(platform: "desktop" | "mobile" = "desktop") {
   const chartControlsRef = useRef<{
     setData: (symbolName: string, priceBars: TPriceBar[]) => void;
     onNewTrade: (
@@ -22,10 +23,10 @@ export function useTradePage() {
 
   const [providerId, setProviderId] = useState<string>("random");
   const [activePeriod, setActivePeriod] = useState<string>("1D");
-  const [activeTool, setActiveTool] = useState<string>("crosshair");
+  const [activeTool, setActiveTool] = useState<string>("pan");
 
   const [ohlcData, setOhlcData] = useState<OhlcLegendData | null>(null);
-  const legendVisible = activeTool === "crosshair";
+  const legendVisible = activeTool === "pan";
 
   const [annotationPopup, setAnnotationPopup] = useState<{
     visible: boolean;
@@ -68,7 +69,7 @@ export function useTradePage() {
   const handleToolChange = (tool: string) => {
     setActiveTool(tool);
     chartControlsRef.current?.setTool(tool);
-    if (tool !== "crosshair") {
+    if (tool !== "pan") {
       setOhlcData(null);
     }
   };
@@ -95,15 +96,24 @@ export function useTradePage() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [handleDeleteSelected]);
 
+  const createInitializer =
+    platform === "mobile" ? createMobileInitializer : createDesktopInitializer;
+
   const initFunc = useMemo(
     () =>
-      createChartInitializer(
+      createInitializer(
         providerId,
         activePeriod,
         handleOhlcUpdate,
         handleAnnotationSelected,
       ),
-    [providerId, activePeriod, handleOhlcUpdate, handleAnnotationSelected],
+    [
+      providerId,
+      activePeriod,
+      handleOhlcUpdate,
+      handleAnnotationSelected,
+      createInitializer,
+    ],
   );
 
   return {

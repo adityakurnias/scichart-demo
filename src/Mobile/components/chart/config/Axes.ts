@@ -1,4 +1,4 @@
-//? this code for X-Axis and Y-Axis (for some information on)
+//? Mobile-specific X-Axis and Y-Axis configuration
 
 import {
   DateTimeNumericAxis,
@@ -40,8 +40,8 @@ export const configureAxes = (
     growBy: new NumberRange(0.1, 0.1),
     labelFormat: ENumericFormat.Decimal,
     labelPrecision: 2,
-    labelPrefix: "$", // TODO: On Prod ini harus dibuat dynamic
-    autoRange: EAutoRange.Always,
+    labelPrefix: "$",
+    autoRange: EAutoRange.Once,
     drawMajorGridLines: true,
     drawMinorGridLines: false,
     drawMajorBands: false,
@@ -53,11 +53,6 @@ export const configureAxes = (
     labelStyle: {
       color: "#787B86",
       fontSize: 12,
-    },
-    autoRangeAnimation: {
-      duration: 500,
-      animateInitialRanging: false,
-      animateSubsequentRanging: true,
     },
     allowFastMath: true,
   });

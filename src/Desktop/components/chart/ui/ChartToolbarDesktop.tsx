@@ -67,18 +67,6 @@ export const ChartToolbarDesktop: React.FC<ChartToolbarProps> = ({
           },
         }}
       >
-        <ToggleButton value="crosshair" aria-label="crosshair">
-          <Tooltip title="Crosshair" arrow placement="right">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-            >
-              <path fill="currentColor" d="M11 21v-8H3v-2h8V3h2v8h8v2h-8v8z" />
-            </svg>
-          </Tooltip>
-        </ToggleButton>
         <ToggleButton value="pan" aria-label="pan">
           <Tooltip title="Pan" arrow placement="right">
             <PanToolIcon />

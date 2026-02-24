@@ -20,7 +20,12 @@ export const setTool = (
   modifiers: { [key: string]: ChartModifierBase2D },
   tool: string,
 ) => {
-  const { crosshairTool, zoomPanModifier, measurmentModifier, pinchZoomModifier } = modifiers;
+  const {
+    crosshairTool,
+    zoomPanModifier,
+    measurmentModifier,
+    pinchZoomModifier,
+  } = modifiers;
 
   if (crosshairTool) crosshairTool.isEnabled = false;
   zoomPanModifier.isEnabled = false;
@@ -30,15 +35,17 @@ export const setTool = (
   switch (tool) {
     case "pan":
       zoomPanModifier.isEnabled = true;
-      crosshairTool.isEnabled = true;
       pinchZoomModifier.isEnabled = true;
+      crosshairTool.isEnabled = true;
       break;
     case "measurement":
       measurmentModifier.isEnabled = true;
       zoomPanModifier.isEnabled = true;
+      pinchZoomModifier.isEnabled = true;
       break;
     default:
       zoomPanModifier.isEnabled = true;
+      pinchZoomModifier.isEnabled = true;
       if (crosshairTool) crosshairTool.isEnabled = true;
       break;
   }

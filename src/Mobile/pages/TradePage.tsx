@@ -1,10 +1,4 @@
-import {
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  Box,
-} from "@mui/material";
+import { FormControl, InputLabel, MenuItem, Select, Box } from "@mui/material";
 import commonClasses from "../../Shared/styles/Examples.module.scss";
 import { SciChartReact, TResolvedReturnType } from "scichart-react";
 import { appTheme } from "../../Shared/styles/theme";
@@ -30,7 +24,7 @@ export default function TradePageMobile() {
     handlePeriodChange,
     handleDeleteSelected,
     initFunc,
-  } = useTradePage();
+  } = useTradePage("mobile");
 
   return (
     <Box
@@ -76,9 +70,9 @@ export default function TradePageMobile() {
             onChange={handleProviderChanged}
           >
             {Object.values(CHART_PROVIDERS).map((prov) => (
-               <MenuItem key={prov.id} value={prov.id}>
-                 {prov.label}
-               </MenuItem>
+              <MenuItem key={prov.id} value={prov.id}>
+                {prov.label}
+              </MenuItem>
             ))}
           </Select>
         </FormControl>

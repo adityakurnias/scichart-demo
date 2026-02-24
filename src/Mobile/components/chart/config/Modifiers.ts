@@ -1,32 +1,26 @@
-//? this code for add some custom feature or chart behaviour that you've been made
+//? Mobile-specific modifiers — pinch zoom (no mousewheel), MeasurementMobile
 
 import {
   SciChartSurface,
   ZoomPanModifier,
-  MouseWheelZoomModifier,
   PinchZoomModifier,
   AnnotationHoverModifier,
   EXyDirection,
 } from "scichart";
-import { Measurment } from "../tools/Measurement";
-import { CrosshairTool } from "../tools/Crosshair";
+import { Measurment } from "../../../../Desktop/components/chart/tools/Measurement";
+import { CrosshairTool } from "../../../../Desktop/components/chart/tools/Crosshair";
 import { OhlcLegendData } from "../../../../Shared/hooks/useChartLegend";
 
 export const configureModifiers = (
   sciChartSurface: SciChartSurface,
   onOhlcUpdate: (data: OhlcLegendData | null) => void,
 ) => {
-  const zoomPanModifier = new ZoomPanModifier({ enableZoom: true });
+  const zoomPanModifier = new ZoomPanModifier({ enableZoom: false });
   zoomPanModifier.isEnabled = false;
 
   const pinchZoomModifier = new PinchZoomModifier({
-    xyDirection: EXyDirection.XDirection,
-  });
-
-  (pinchZoomModifier as any).scaleFactor = 0.0005;
-
-  const mouseWheelZoomModifier = new MouseWheelZoomModifier({
-    xyDirection: EXyDirection.XDirection,
+    horizontalGrowFactor: 0.001,
+    verticalGrowFactor: 0.001,
   });
 
   const measurmentModifier = new Measurment();
@@ -39,7 +33,6 @@ export const configureModifiers = (
     crosshairTool,
     zoomPanModifier,
     pinchZoomModifier,
-    mouseWheelZoomModifier,
     measurmentModifier,
     new AnnotationHoverModifier(),
   );
