@@ -8,6 +8,7 @@ import { ChartLegendMobile } from "../../Mobile/components/chart/ui/ChartLegendM
 import { AnnotationPopupMobile } from "../../Mobile/components/chart/ui/AnnotationPopupMobile";
 import { CHART_PROVIDERS } from "../../Shared/services/ChartProviders";
 import { useTradePage } from "../../Shared/hooks/useTradePage";
+import { createChartInitializer } from "../../Mobile/components/chart/core/ChartAllPeriod";
 
 export default function TradePageMobile() {
   const {
@@ -24,7 +25,7 @@ export default function TradePageMobile() {
     handlePeriodChange,
     handleDeleteSelected,
     initFunc,
-  } = useTradePage("mobile");
+  } = useTradePage(createChartInitializer);
 
   return (
     <Box

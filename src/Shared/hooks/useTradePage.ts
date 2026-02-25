@@ -1,10 +1,22 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { OhlcLegendData } from "./useChartLegend";
 import { TPriceBar } from "../types/types";
-import { createChartInitializer as createDesktopInitializer } from "../../Desktop/components/chart/core/ChartAllPeriod";
-import { createChartInitializer as createMobileInitializer } from "../../Mobile/components/chart/core/ChartAllPeriod";
-
-export function useTradePage(platform: "desktop" | "mobile" = "desktop") {
+export function useTradePage(
+  createInitializer: (
+    providerId: string,
+    period: string,
+    onOhlcUpdate: (data: OhlcLegendData | null) => void,
+    onAnnotationSelected?: (event: {
+      selected: boolean;
+      pixelX: number;
+      pixelY: number;
+    }) => void,
+  ) => (rootElement: string | HTMLDivElement) => Promise<{
+    sciChartSurface: any;
+    subscription: { unsubscribe: () => void };
+    controls: any;
+  }>,
+) {
   const chartControlsRef = useRef<{
     setData: (symbolName: string, priceBars: TPriceBar[]) => void;
     onNewTrade: (
@@ -95,9 +107,6 @@ export function useTradePage(platform: "desktop" | "mobile" = "desktop") {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [handleDeleteSelected]);
-
-  const createInitializer =
-    platform === "mobile" ? createMobileInitializer : createDesktopInitializer;
 
   const initFunc = useMemo(
     () =>
