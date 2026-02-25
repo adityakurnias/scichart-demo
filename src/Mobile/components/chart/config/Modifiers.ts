@@ -5,10 +5,9 @@ import {
   ZoomPanModifier,
   PinchZoomModifier,
   AnnotationHoverModifier,
-  EXyDirection,
 } from "scichart";
 import { Measurment } from "../../../../Desktop/components/chart/tools/Measurement";
-import { CrosshairTool } from "../../../../Desktop/components/chart/tools/Crosshair";
+import { CrosshairMobile } from "../tools/CrosshairMobile";
 import { OhlcLegendData } from "../../../../Shared/hooks/useChartLegend";
 
 export const configureModifiers = (
@@ -26,7 +25,8 @@ export const configureModifiers = (
   const measurmentModifier = new Measurment();
   measurmentModifier.isEnabled = false;
 
-  const crosshairTool = new CrosshairTool(onOhlcUpdate);
+  // Mobile crosshair: long-press → drag → release (TradingView-style)
+  const crosshairTool = new CrosshairMobile(onOhlcUpdate, zoomPanModifier);
   crosshairTool.isEnabled = true;
 
   sciChartSurface.chartModifiers.add(

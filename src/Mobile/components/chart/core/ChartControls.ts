@@ -27,16 +27,17 @@ export const setTool = (
     pinchZoomModifier,
   } = modifiers;
 
-  if (crosshairTool) crosshairTool.isEnabled = false;
+  // Mobile crosshair always enabled — it activates only on long-press,
+  // so it never conflicts with pan/pinch/measurement gestures.
   zoomPanModifier.isEnabled = false;
   measurmentModifier.isEnabled = false;
   pinchZoomModifier.isEnabled = false;
+  if (crosshairTool) crosshairTool.isEnabled = true;
 
   switch (tool) {
     case "pan":
       zoomPanModifier.isEnabled = true;
       pinchZoomModifier.isEnabled = true;
-      crosshairTool.isEnabled = true;
       break;
     case "measurement":
       measurmentModifier.isEnabled = true;
@@ -46,7 +47,6 @@ export const setTool = (
     default:
       zoomPanModifier.isEnabled = true;
       pinchZoomModifier.isEnabled = true;
-      if (crosshairTool) crosshairTool.isEnabled = true;
       break;
   }
 };
