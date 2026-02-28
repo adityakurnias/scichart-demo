@@ -6,7 +6,7 @@ import {
   PinchZoomModifier,
   AnnotationHoverModifier,
 } from "scichart";
-import { Measurment } from "../../../../Desktop/components/chart/tools/Measurement";
+import { MeasurementMobile } from "../tools/MeasurementMobile";
 import { CrosshairMobile } from "../tools/CrosshairMobile";
 import { OhlcLegendData } from "../../../../Shared/hooks/useChartLegend";
 
@@ -22,7 +22,7 @@ export const configureModifiers = (
     verticalGrowFactor: 0.001,
   });
 
-  const measurmentModifier = new Measurment();
+  const measurmentModifier = new MeasurementMobile(zoomPanModifier);
   measurmentModifier.isEnabled = false;
 
   // Mobile crosshair: long-press → drag → release (TradingView-style)
