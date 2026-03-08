@@ -75,7 +75,8 @@ type SniperPhase =
   | "dragging"        // TAP #1 done, box forming, waiting TAP #2
   | "selected"        // a box is selected in pan mode
   | "resizing_start"
-  | "resizing_end";
+  | "resizing_end"
+  | "moving";         // drag selected box to new position
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -114,6 +115,14 @@ export class SniperMeasurement extends ChartModifierBase2D {
   private chAnchorY = 0;
   /** Track if finger moved enough to be a drag vs tap */
   private fingerMoved = false;
+
+  // ── Move drag state ──────────────────────────────────────────────────────────────
+  /** Finger pixel position when move-drag started */
+  private moveAnchorX = 0;
+  private moveAnchorY = 0;
+  /** Data coords of box corners when move-drag started */
+  private moveOriginX1 = 0; private moveOriginY1 = 0;
+  private moveOriginX2 = 0; private moveOriginY2 = 0;
 
   // ── Draw state ─────────────────────────────────────────────────────────────
   private startDataX = 0;
@@ -306,10 +315,14 @@ export class SniperMeasurement extends ChartModifierBase2D {
         return;
       }
 
-      // Box tap → select
+      // Box tap → select + record anchor for potential move-drag
       const boxHit = this.hitTestBox(pt);
       if (boxHit) {
         this.selectGroup(boxHit);
+        // Record finger + box origin so move-drag can start immediately
+        this.moveAnchorX = pt.x; this.moveAnchorY = pt.y;
+        this.moveOriginX1 = boxHit.x1; this.moveOriginY1 = boxHit.y1;
+        this.moveOriginX2 = boxHit.x2; this.moveOriginY2 = boxHit.y2;
         args.handled = true;
         return;
       }
@@ -351,6 +364,26 @@ export class SniperMeasurement extends ChartModifierBase2D {
     }
 
     // ── Resize ────────────────────────────────────────────────────────────
+    // Move selected measurement (promoted from "selected" once finger exceeds TAP_THRESHOLD)
+    if (this.phase === "moving" && this.selectedGroup) {
+      this.applyMove(x, y);
+      args.handled = true;
+      return;
+    }
+
+    // Promote selected → moving once finger exceeds tap threshold on a box
+    if (this.phase === "selected" && this.selectedGroup) {
+      const dxMove = Math.abs(x - this.moveAnchorX);
+      const dyMove = Math.abs(y - this.moveAnchorY);
+      if (dxMove > TAP_THRESHOLD || dyMove > TAP_THRESHOLD) {
+        this.phase = "moving";
+        this.disablePan();
+        this.applyMove(x, y);
+        args.handled = true;
+        return;
+      }
+    }
+
     if (
       (this.phase === "resizing_start" || this.phase === "resizing_end") &&
       this.selectedGroup
@@ -384,7 +417,21 @@ export class SniperMeasurement extends ChartModifierBase2D {
       return;
     }
 
-    // ── End resize ────────────────────────────────────────────────────────
+    // End move
+    if (this.phase === "moving") {
+      this.phase = "selected";
+      this.enablePan();
+      if (this.selectedGroup) {
+        this.moveAnchorX    = args.mousePoint.x; this.moveAnchorY    = args.mousePoint.y;
+        this.moveOriginX1   = this.selectedGroup.x1; this.moveOriginY1 = this.selectedGroup.y1;
+        this.moveOriginX2   = this.selectedGroup.x2; this.moveOriginY2 = this.selectedGroup.y2;
+        this.emitSelection(this.selectedGroup);
+      }
+      args.handled = true;
+      return;
+    }
+
+    // End resize──────────────────────────────────────────────────────
     if (this.phase === "resizing_start" || this.phase === "resizing_end") {
       this.phase = "selected";
       this.enablePan();
@@ -474,6 +521,35 @@ export class SniperMeasurement extends ChartModifierBase2D {
     this.phase         = "idle";
     this.removeGroup(g);
     this.onSelectionChange?.({ selected: false });
+  }
+
+  /**
+   * Translate entire measurement by finger delta from move anchor.
+   * All 4 corners shift by the same (dx, dy) in data space.
+   */
+  private applyMove(px: number, py: number): void {
+    const g = this.selectedGroup; if (!g) return;
+    const xCalc = this.xCalc(); const yCalc = this.yCalc();
+
+    // Delta in pixel space
+    const dxPx = px - this.moveAnchorX;
+    const dyPx = py - this.moveAnchorY;
+
+    // Convert origin corners + delta to data space
+    const ox1Px = xCalc.getCoordinate(this.moveOriginX1);
+    const oy1Px = yCalc.getCoordinate(this.moveOriginY1);
+    const ox2Px = xCalc.getCoordinate(this.moveOriginX2);
+    const oy2Px = yCalc.getCoordinate(this.moveOriginY2);
+
+    g.x1 = xCalc.getDataValue(ox1Px + dxPx);
+    g.y1 = yCalc.getDataValue(oy1Px + dyPx);
+    g.x2 = xCalc.getDataValue(ox2Px + dxPx);
+    g.y2 = yCalc.getDataValue(oy2Px + dyPx);
+
+    g.startDot.x1 = g.x1; g.startDot.y1 = g.y1;
+    g.endDot.x1   = g.x2; g.endDot.y1   = g.y2;
+
+    this.rebuildGroupAnnotations(g);
   }
 
   private applyResize(px: number, py: number): void {
