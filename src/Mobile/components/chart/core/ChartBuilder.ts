@@ -23,13 +23,13 @@ export const createCandlestickChart = async (
   rootElement: string | HTMLDivElement,
   onOhlcUpdate: (data: OhlcLegendData | null) => void,
   onAnnotationSelected?: AnnotationSelectionCallback,
+  onSniperDeactivate?: () => void, // 👈 NEW
 ) => {
   const { sciChartSurface, wasmContext } = await SciChartSurface.create(
     rootElement,
     { theme: appTheme.TradingViewTheme },
   );
 
-  // Store callback on the surface so annotation tools can fire it without coupling
   (sciChartSurface as any).__onAnnotationSelected =
     onAnnotationSelected ?? null;
 
@@ -39,7 +39,13 @@ export const createCandlestickChart = async (
     wasmContext,
     onOhlcUpdate,
   );
-  const modifiers = configureModifiers(sciChartSurface, onOhlcUpdate);
+
+  // 👇 pass onSniperDeactivate ke configureModifiers
+  const modifiers = configureModifiers(
+    sciChartSurface,
+    onOhlcUpdate,
+    onSniperDeactivate,
+  );
 
   const { latestPriceAnnotation } = PriceAnnotation(sciChartSurface);
 
@@ -70,6 +76,8 @@ export const createCandlestickChart = async (
     ) => {
       (sciChartSurface as any).__onAnnotationSelected = cb;
     },
+    // 👇 NEW — lets TradePageMobile grab the sniper modifier ref
+    getSniperModifier: () => modifiers.sniperModifier,
   };
 
   return { sciChartSurface, controls };
