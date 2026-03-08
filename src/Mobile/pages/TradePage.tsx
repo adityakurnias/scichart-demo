@@ -6,9 +6,12 @@ import { ChartToolbarMobile } from "../../Mobile/components/chart/ui/ChartToolba
 import { TimeFrameSelectorMobile } from "../../Mobile/components/chart/ui/TimeFrameSelectorMobile";
 import { ChartLegendMobile } from "../../Mobile/components/chart/ui/ChartLegendMobile";
 import { AnnotationPopupMobile } from "../../Mobile/components/chart/ui/AnnotationPopupMobile";
+import { SniperToolbar } from "../components/chart/ui/SniperToolbarMobile";
 import { CHART_PROVIDERS } from "../../Shared/services/ChartProviders";
 import { useTradePage } from "../../Shared/hooks/useTradePage";
 import { createChartInitializer } from "../../Mobile/components/chart/core/ChartAllPeriod";
+import { useRef, useState, useCallback } from "react";                           // 👈 NEW
+import { SniperMeasurement } from "../../Mobile/components/chart/tools/SniperMeasurement"; // 👈 NEW
 
 export default function TradePageMobile() {
   const {
@@ -26,6 +29,17 @@ export default function TradePageMobile() {
     handleDeleteSelected,
     initFunc,
   } = useTradePage(createChartInitializer);
+
+  // ── Sniper toolbar state ──────────────────────────────────────────────────
+  const sniperModRef = useRef<SniperMeasurement | null>(null);
+  const [sniperSelected, setSniperSelected] = useState(false);
+
+  const handleSniperSelection = useCallback(
+    (info: { selected: boolean }) => {
+      setSniperSelected(info.selected);
+    },
+    [],
+  );
 
   return (
     <Box
@@ -82,14 +96,14 @@ export default function TradePageMobile() {
       <div
         style={{
           display: "flex",
-          flexDirection: "column", // Mobile specific
+          flexDirection: "column",
           height: "100%",
           width: "100%",
           overflow: "hidden",
           flex: 1,
         }}
       >
-        {/* Chart + legend overlay container */}
+        {/* Chart + overlay container */}
         <div
           ref={chartContainerRef}
           style={{
@@ -98,9 +112,22 @@ export default function TradePageMobile() {
             flexDirection: "column",
             width: "100%",
             height: "100%",
-            flex: 1, // Take available vertical space
+            flex: 1,
           }}
         >
+          {/* 👇 NEW — fixed sniper toolbar at top of chart area */}
+          <SniperToolbar
+            visible={sniperSelected}
+            onDelete={() => {
+              sniperModRef.current?.deleteSelected();
+              setSniperSelected(false);
+            }}
+            onDeselect={() => {
+              sniperModRef.current?.deselectAll();
+              setSniperSelected(false);
+            }}
+          />
+
           <ChartLegendMobile data={ohlcData} visible={legendVisible} />
 
           <AnnotationPopupMobile
@@ -117,6 +144,13 @@ export default function TradePageMobile() {
               const { subscription, controls } = initResult;
               chartControlsRef.current = controls;
               controls.setTool(activeTool);
+
+              // 👇 NEW — grab sniperModifier ref for toolbar callbacks
+              sniperModRef.current = controls.getSniperModifier?.() ?? null;
+              if (sniperModRef.current) {
+                sniperModRef.current.onSelectionChange = handleSniperSelection;
+              }
+
               return () => subscription.unsubscribe();
             }}
             style={{
@@ -135,7 +169,7 @@ export default function TradePageMobile() {
           />
         </div>
 
-        {/* Toolbar pinned to bottom for mobile */}
+        {/* Toolbar pinned to bottom */}
         <ChartToolbarMobile
           activeTool={activeTool}
           onToolChange={handleToolChange}

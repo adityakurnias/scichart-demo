@@ -1,15 +1,9 @@
-//? this code for control our components, if we dont wanna use it, dont regist it at the switch case code!
+//? this code for control our components
 
 import { NumberRange, AxisBase2D, ChartModifierBase2D } from "scichart";
+import { SniperMeasurement } from "../tools/SniperMeasurement";
 
-export const setXRange = (
-  xAxis: AxisBase2D,
-  startDate: Date,
-  endDate: Date,
-) => {
-  console.log(
-    `createCandlestickChart(): Setting chart range to ${startDate} - ${endDate}`,
-  );
+export const setXRange = (xAxis: AxisBase2D, startDate: Date, endDate: Date) => {
   xAxis.visibleRange = new NumberRange(
     startDate.getTime() / 1000,
     endDate.getTime() / 1000,
@@ -24,28 +18,41 @@ export const setTool = (
     crosshairTool,
     zoomPanModifier,
     measurmentModifier,
+    sniperModifier,
     pinchZoomModifier,
   } = modifiers;
 
-  // Mobile crosshair always enabled — it activates only on long-press,
-  // so it never conflicts with pan/pinch/measurement gestures.
-  zoomPanModifier.isEnabled = false;
-  measurmentModifier.isEnabled = false;
-  pinchZoomModifier.isEnabled = false;
-  if (crosshairTool) crosshairTool.isEnabled = true;
+  // Reset standard modifiers
+  if (crosshairTool)      crosshairTool.isEnabled      = false;
+  if (zoomPanModifier)    zoomPanModifier.isEnabled    = false;
+  if (measurmentModifier) measurmentModifier.isEnabled = false;
+  if (pinchZoomModifier)  pinchZoomModifier.isEnabled  = false;
+
+  // Sniper uses its own phase system — tell it to exit drawing mode
+  // but keep it "on" at SciChart level so it can intercept box taps in pan mode
+  const sniper = sniperModifier as SniperMeasurement | undefined;
+  if (sniper) sniper.isEnabled = false; // triggers exitDrawingMode(), keeps receiveHandledEvents
 
   switch (tool) {
     case "pan":
-      zoomPanModifier.isEnabled = true;
+      zoomPanModifier.isEnabled   = true;
+      crosshairTool.isEnabled     = true;
       pinchZoomModifier.isEnabled = true;
       break;
-    case "measurement":
-      measurmentModifier.isEnabled = true;
-      zoomPanModifier.isEnabled = true;
-      pinchZoomModifier.isEnabled = true;
+
+    // case "measurement":
+    //   measurmentModifier.isEnabled = true;
+    //   zoomPanModifier.isEnabled    = true;
+    //   break;
+
+    case "sniper":
+      // isEnabled = true triggers enterCrosshairPhase() → crosshair spawns at center
+      if (sniper) sniper.isEnabled = true;
       break;
+
     default:
-      zoomPanModifier.isEnabled = true;
+      zoomPanModifier.isEnabled   = true;
+      crosshairTool.isEnabled     = true;
       pinchZoomModifier.isEnabled = true;
       break;
   }

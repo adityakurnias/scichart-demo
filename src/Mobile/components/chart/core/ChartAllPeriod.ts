@@ -12,12 +12,14 @@ export const createChartInitializer =
     period: string,
     onOhlcUpdate: (data: OhlcLegendData | null) => void,
     onAnnotationSelected?: AnnotationSelectionCallback,
+    onSniperDeactivate?: () => void, // 👈 NEW
   ) =>
   async (rootElement: string | HTMLDivElement) => {
     const { sciChartSurface, controls } = await createCandlestickChart(
       rootElement,
       onOhlcUpdate,
       onAnnotationSelected,
+      onSniperDeactivate, // 👈 NEW
     );
 
     const provider = CHART_PROVIDERS[providerId] || CHART_PROVIDERS["random"];
@@ -27,46 +29,16 @@ export const createChartInitializer =
     let interval = "1h";
 
     switch (period) {
-      case "1D":
-        interval = "5m";
-        startDate.setDate(endDate.getDate() - 1);
-        break;
-      case "5D":
-        interval = "15m";
-        startDate.setDate(endDate.getDate() - 5);
-        break;
-      case "1M":
-        interval = "1h";
-        startDate.setMonth(endDate.getMonth() - 1);
-        break;
-      case "3M":
-        interval = "4h";
-        startDate.setMonth(endDate.getMonth() - 3);
-        break;
-      case "6M":
-        interval = "12h";
-        startDate.setMonth(endDate.getMonth() - 6);
-        break;
-      case "YTD":
-        interval = "1d";
-        startDate.setFullYear(endDate.getFullYear(), 0, 1);
-        break;
-      case "1Y":
-        interval = "1d";
-        startDate.setFullYear(endDate.getFullYear() - 1);
-        break;
-      case "5Y":
-        interval = "1w";
-        startDate.setFullYear(endDate.getFullYear() - 5);
-        break;
-      case "All":
-        interval = "1M";
-        startDate.setFullYear(2017);
-        break;
-      default:
-        interval = "1h";
-        startDate.setDate(endDate.getDate() - 1);
-        break;
+      case "1D":  interval = "5m";  startDate.setDate(endDate.getDate() - 1); break;
+      case "5D":  interval = "15m"; startDate.setDate(endDate.getDate() - 5); break;
+      case "1M":  interval = "1h";  startDate.setMonth(endDate.getMonth() - 1); break;
+      case "3M":  interval = "4h";  startDate.setMonth(endDate.getMonth() - 3); break;
+      case "6M":  interval = "12h"; startDate.setMonth(endDate.getMonth() - 6); break;
+      case "YTD": interval = "1d";  startDate.setFullYear(endDate.getFullYear(), 0, 1); break;
+      case "1Y":  interval = "1d";  startDate.setFullYear(endDate.getFullYear() - 1); break;
+      case "5Y":  interval = "1w";  startDate.setFullYear(endDate.getFullYear() - 5); break;
+      case "All": interval = "1M";  startDate.setFullYear(2017); break;
+      default:    interval = "1h";  startDate.setDate(endDate.getDate() - 1); break;
     }
 
     const priceBars = await provider.getHistory(

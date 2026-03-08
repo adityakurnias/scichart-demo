@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { OhlcLegendData } from "./useChartLegend";
 import { TPriceBar } from "../types/types";
+
 export function useTradePage(
   createInitializer: (
     providerId: string,
@@ -11,6 +12,7 @@ export function useTradePage(
       pixelX: number;
       pixelY: number;
     }) => void,
+    onSniperDeactivate?: () => void, // 👈 NEW
   ) => (rootElement: string | HTMLDivElement) => Promise<{
     sciChartSurface: any;
     subscription: { unsubscribe: () => void };
@@ -19,11 +21,7 @@ export function useTradePage(
 ) {
   const chartControlsRef = useRef<{
     setData: (symbolName: string, priceBars: TPriceBar[]) => void;
-    onNewTrade: (
-      priceBar: TPriceBar,
-      tradeSize: number,
-      lastTradeBuyOrSell: boolean,
-    ) => void;
+    onNewTrade: (priceBar: TPriceBar, tradeSize: number, lastTradeBuyOrSell: boolean) => void;
     setXRange: (startDate: Date, endDate: Date) => void;
     setTool: (tool: string) => void;
     addLineAnnotation: () => void;
@@ -33,12 +31,12 @@ export function useTradePage(
 
   const chartContainerRef = useRef<HTMLDivElement>(null);
 
-  const [providerId, setProviderId] = useState<string>("random");
+  const [providerId, setProviderId]   = useState<string>("random");
   const [activePeriod, setActivePeriod] = useState<string>("1D");
-  const [activeTool, setActiveTool] = useState<string>("pan");
+  const [activeTool, setActiveTool]   = useState<string>("pan");
 
-  const [ohlcData, setOhlcData] = useState<OhlcLegendData | null>(null);
-  const legendVisible = activeTool === "pan";
+  const [ohlcData, setOhlcData]       = useState<OhlcLegendData | null>(null);
+  const legendVisible                 = activeTool === "pan";
 
   const [annotationPopup, setAnnotationPopup] = useState<{
     visible: boolean;
@@ -53,16 +51,11 @@ export function useTradePage(
   const handleAnnotationSelected = useCallback(
     (event: { selected: boolean; pixelX: number; pixelY: number }) => {
       if (event.selected) {
-        const containerRect =
-          chartContainerRef.current?.getBoundingClientRect();
-        const canvasEl = chartContainerRef.current?.querySelector("canvas");
-        const canvasRect = canvasEl?.getBoundingClientRect();
-        const offsetX =
-          canvasRect && containerRect
-            ? canvasRect.left - containerRect.left
-            : 0;
-        const offsetY =
-          canvasRect && containerRect ? canvasRect.top - containerRect.top : 0;
+        const containerRect = chartContainerRef.current?.getBoundingClientRect();
+        const canvasEl      = chartContainerRef.current?.querySelector("canvas");
+        const canvasRect    = canvasEl?.getBoundingClientRect();
+        const offsetX       = canvasRect && containerRect ? canvasRect.left - containerRect.left : 0;
+        const offsetY       = canvasRect && containerRect ? canvasRect.top  - containerRect.top  : 0;
         setAnnotationPopup({
           visible: true,
           x: event.pixelX + offsetX,
@@ -75,8 +68,14 @@ export function useTradePage(
     [],
   );
 
-  const handleProviderChanged = (event: any) =>
-    setProviderId(event.target.value);
+  // 👇 NEW — dipanggil oleh SniperMeasurement setelah tap ke-2 (finalize)
+  //    Otomatis balik ke tool "pan" supaya tombol toolbar ikut deselect
+  const handleSniperDeactivate = useCallback(() => {
+    setActiveTool("pan");
+    chartControlsRef.current?.setTool("pan");
+  }, []);
+
+  const handleProviderChanged = (event: any) => setProviderId(event.target.value);
 
   const handleToolChange = (tool: string) => {
     setActiveTool(tool);
@@ -86,7 +85,7 @@ export function useTradePage(
     }
   };
 
-  const handlePeriodChange = (period: string) => setActivePeriod(period);
+  const handlePeriodChange  = (period: string) => setActivePeriod(period);
 
   const handleDeleteSelected = useCallback(() => {
     chartControlsRef.current?.deleteSelectedAnnotations();
@@ -115,12 +114,14 @@ export function useTradePage(
         activePeriod,
         handleOhlcUpdate,
         handleAnnotationSelected,
+        handleSniperDeactivate, // 👈 NEW
       ),
     [
       providerId,
       activePeriod,
       handleOhlcUpdate,
       handleAnnotationSelected,
+      handleSniperDeactivate, // 👈 NEW
       createInitializer,
     ],
   );
